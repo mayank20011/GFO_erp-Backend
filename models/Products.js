@@ -2,16 +2,16 @@ import mongoose from "mongoose";
 
 const ProductSchema=new mongoose.Schema(
   {
-    ProductName:{
+    productName:{
        type:String,
        required:[true,'Enter Product Name'],
        trim:true,
     },
-    Quantity:{
+    quantity:{
       type:String,
       required:[true,'Enter the Product Quantity'],
       trim:true,
     }
   });
-  
+
 export default mongoose.model('Products',ProductSchema);

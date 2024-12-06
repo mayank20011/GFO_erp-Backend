@@ -13,10 +13,22 @@ export function addProduct(req,res,next)
       })
     .catch((err)=>
       {
+        if(err.name==="ValidationError")
+          {
+            let errorMessageArray=[];
+            Object.keys(err.errors).forEach((key)=>{
+              errorMessageArray.push(err.errors[`${key}`].message);
+            })
+            res.status(400).json({
+              success:false,
+              errors:errorMessageArray,
+            })
+          }
+        else{
         res.status(500).json({
           success:false,
           message:`Server Error`,
-        })
+        }) } 
       });
 
 }
