@@ -55,5 +55,6 @@ server.get("/",(req,res)=>{
 
 server.listen(PORT,()=>
   {
+    console.log(`${PORT}`)
     console.log(`Server running on port ${PORT}`);
   })   
