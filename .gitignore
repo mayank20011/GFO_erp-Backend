@@ -17,7 +17,7 @@ build/
 
 # Temporary files
 *.tmp
-*.swp
+*.swp    
 
 # Operating system files
 .DS_Store
