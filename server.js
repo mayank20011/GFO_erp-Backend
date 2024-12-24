@@ -32,7 +32,6 @@ server.use(cors());
 // applying middleware
 server.use(express.json());
 
-
 // Routes ie:- also middleware
 
 // For Clients Who are going to purchase from us
@@ -49,6 +48,10 @@ server.use('/GFOERP/PurchaseData',PurchaseDataRouter);
 server.use('/GFOERP/SalesData',salesDataRouter);
 // for Route Clients Names
 server.use('/GFOERP/RouteClient',RouteClientRouter);
+
+server.get("/",(req,res)=>{
+   res.json({data:"Hello"});
+});
 
 server.listen(PORT,()=>
   {
