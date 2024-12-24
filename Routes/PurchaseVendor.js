@@ -1,9 +1,11 @@
 import { Router } from "express";
-import { getAllVendors } from "../controllers/PurchaseVendor.js";
+import { getAllVendors, addNewVendor, replaceVendor } from "../controllers/PurchaseVendor.js";
 
 const purchaseVendorRouter= Router();
 
 purchaseVendorRouter.route("/")
-.get(getAllVendors);
+.get(getAllVendors)
+.post(addNewVendor)
+.put(replaceVendor);
 
 export default purchaseVendorRouter;

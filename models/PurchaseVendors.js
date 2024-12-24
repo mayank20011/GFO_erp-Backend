@@ -5,9 +5,13 @@ const PurchaseVendor = new Schema({
     type: String,
     required: [true, "Enter Name of the Vendor"],
   },
-  rate: {
+  snfRate: {
     type: Number,
-    required: [true, "Enter Rate at which you will buy milk from client"],
+    required: [true, "Enter Rate of snf for purchasing"],
+  },
+  fatRate: {
+    type: Number,
+    required: [true, "Enter Rate of fat for purchasing"],
   },
   phoneNumber: {
     type: [String],
