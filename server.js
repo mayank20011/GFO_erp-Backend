@@ -49,6 +49,8 @@ server.use('/GFOERP/SalesData',salesDataRouter);
 // for Route Clients Names
 server.use('/GFOERP/RouteClient',RouteClientRouter);
 
+console.log("Hello")
+
 server.get("/",(req,res)=>{
    res.json({data:"Hello"});
 });
