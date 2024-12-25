@@ -52,7 +52,7 @@ server.use('/GFOERP/RouteClient',RouteClientRouter);
 console.log("Hello")
 
 server.get("/",(req,res)=>{
-   res.json({data:"Hello"});
+   res.json("Hello");
 });
 
 server.listen(PORT,()=>
