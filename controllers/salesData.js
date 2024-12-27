@@ -26,3 +26,26 @@ export function addSalesData(req, res) {
   });
   
 }
+
+export function getClientsData(req,res){
+  salesData.find({vendorName:req.params.vendorName , client:req.params.client})
+  .then((data)=>{
+    if(data.length!=0){
+    res.status(201).json({
+      success:true,
+      data:data
+    })}
+    else{
+      res.status(202).json({
+       succes:false,
+       message:"Can't find Data"
+      })
+    }
+  })
+  .catch(()=>{
+    res.status(500).json({
+      success:false,
+       message:'Server problem'
+    })
+  });
+}
