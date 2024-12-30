@@ -1,11 +1,13 @@
 import { Router } from "express";
-import {getPurchaseData, createObjForVendor, savePurchaseData} from "../controllers/PurchaseData.js";
+import {getPurchaseData, createObjForVendor, savePurchaseData, PurchasingClientNames} from "../controllers/PurchaseData.js";
 const PurchaseDataRouter=Router();
 
 PurchaseDataRouter.route("/")
-.get(getPurchaseData)
+.get(PurchasingClientNames)
 .post(savePurchaseData);
 
+PurchaseDataRouter.route("/:_id")
+.get(getPurchaseData)
 PurchaseDataRouter.route("/createRecord")
 .post(createObjForVendor);
 

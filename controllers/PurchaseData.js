@@ -1,7 +1,47 @@
 import PurchaseData from "../models/PurchaseData.js";
 
-export function getPurchaseData(req, res) {
+export function PurchasingClientNames(req, res) {
+  PurchaseData.find()
+    .select("vendorName _id")
+    .then((data) => {
+      res.status(201).json({
+        success: true,
+        message: "Data Found",
+        data: data,
+      });
+    })
+    .catch((err) => {
+      res.status(500).json({
+        success: false,
+        err: err,
+        message: `Server Problem`,
+      });
+    });
+}
 
+export function getPurchaseData(req, res) {
+  PurchaseData.findById(req.params._id)
+    .then((data) => {
+      if (data) {
+        res.status(201).json({
+          success: true,
+          data: data.purchaseRecord,
+          message: "Data Found",
+        });
+      } else {
+        res.status(202).json({
+          success: false,
+          message: "Data Not Found",
+        });
+      }
+    })
+    .catch((err) => {
+      console.log(err);
+      res.status(500).json({
+        success: false,
+        message: "Server Problem",
+      });
+    });
 }
 
 export function savePurchaseData(req, res) {
@@ -41,27 +81,25 @@ export function savePurchaseData(req, res) {
     });
 }
 
-export function createObjForVendor(req, res, next)
-{
+export function createObjForVendor(req, res, next) {
   console.log(req.body);
   PurchaseData.create(req.body)
-  .then((data)=>{
-    if(data){
-       res.status(201).json({
-        success:true,
-       });
-    }
-    else{
-       res.status(404).json({
-         success:false,
-         err:'Cant Save in Db'
-       });
-    }
-  })
-  .catch((err)=>{
-    res.status(500).json({
-      success:false,
-      err:err,
+    .then((data) => {
+      if (data) {
+        res.status(201).json({
+          success: true,
+        });
+      } else {
+        res.status(404).json({
+          success: false,
+          err: "Cant Save in Db",
+        });
+      }
     })
-  });
+    .catch((err) => {
+      res.status(500).json({
+        success: false,
+        err: err,
+      });
+    });
 }
