@@ -9,6 +9,7 @@ import purchaseVendorRouter from "./Routes/PurchaseVendor.js";
 import PurchaseDataRouter from "./Routes/PurchaseData.js";
 import salesDataRouter from "./Routes/salesData.js";
 import RouteClientRouter from "./Routes/routeClient.js";
+import paymentRouter from "./Routes/PaymentRecord.js";
 
 // where to look config file
 dotenv.config({path: './config/config.env'});
@@ -48,6 +49,8 @@ server.use('/GFOERP/PurchaseData',PurchaseDataRouter);
 server.use('/GFOERP/SalesData',salesDataRouter);
 // for Route Clients Names
 server.use('/GFOERP/RouteClient',RouteClientRouter);
+// for Purchase and sales Record
+server.use('/GFOERP/PaymentRecords',paymentRouter);
 
 server.get("/",(req,res)=>{
    res.json("Hello");
