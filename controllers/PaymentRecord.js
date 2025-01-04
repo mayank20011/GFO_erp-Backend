@@ -1,6 +1,7 @@
 import paymentSchema from "../models/PayamentRecord.js";
 
 export function getSpecifVendorRecord(req,res){
+  console.log(req.params._id)
    paymentSchema.find({vendor_id:req.params._id}).sort({ _id: -1 }).limit(10)
    .then((data)=>{
      if(data.length!=0 || data!=null){
