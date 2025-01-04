@@ -22,18 +22,20 @@ const server = express();
 
 // Allowing origins using cors
 
-server.use(
-  cors({
-    origin: [
-      "http://localhost:5173",
-      "http://localhost:5174",
-      "https://gfoerp-form-v2.vercel.app/",
-      "https://gfoerp-dashboard.vercel.app/",
-    ],
-    methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
-    allowedHeaders: ["Content-Type", "Authorization"],
-  })
-);
+// server.use(
+//   cors({
+//     origin: [
+//       "http://localhost:5173",
+//       "http://localhost:5174",
+//       "https://gfoerp-form-v2.vercel.app/",
+//       "https://gfoerp-dashboard.vercel.app/",
+//     ],
+//     methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
+//     allowedHeaders: ["Content-Type", "Authorization"],
+//   })
+// );
+
+server.use(cors());
 
 // applying middleware
 server.use(express.json());
