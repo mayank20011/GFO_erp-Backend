@@ -10,6 +10,9 @@ const RouteClientSchema = new mongoose.Schema({
     type: String,
     trim: true,
     required: [true, "Add Client Name"],
+  },
+  balanceAmount:{
+    type:Number,
   }
 });
 

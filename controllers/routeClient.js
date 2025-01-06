@@ -1,7 +1,8 @@
 import RouteClients from "../models/routeClient.js";
 
 export function addClient(req, res) {
-  RouteClients.findOne(req.body)
+  console.log(req.body);
+  RouteClients.findOne({clientName:req.body.clientName , vendorName:req.body.vendorName})
     .then((dataReturned) => {
       console.log(dataReturned);
       if (dataReturned) {
