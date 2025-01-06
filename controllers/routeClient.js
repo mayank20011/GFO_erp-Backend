@@ -1,4 +1,6 @@
 import RouteClients from "../models/routeClient.js";
+import paymentSchema from "../models/PayamentRecord.js";
+import { startSessionAndTransaction } from "../config/db.js";
 
 export function addClient(req, res) {
   console.log(req.body);
@@ -114,4 +116,31 @@ export function deleteClient(req, res) {
       err:err
     })
   })
+}
+
+export function updateBalanceAndKeepHistory(req, res) {
+  const { update, record } = req.body;
+  const runTransactionExample = () => {
+    return startSessionAndTransaction((session) => {
+      return paymentSchema
+        .create([record], { session })  // Wrap record in an array
+        .then(() =>
+          RouteClients.findByIdAndUpdate(
+            update._id,
+            { balanceAmount: update.balanceAmount },
+            { new: true, session }  // Include session in options
+          )
+        );
+    });
+  };
+
+  runTransactionExample()
+    .then(() => {
+      // Transaction committed, send a success response
+      res.status(200).json({ message: "Transaction successful", success: true, data: { update, record } });
+    })
+    .catch((error) => {
+      // Transaction aborted or an error occurred, send an error response
+      res.status(500).json({ message: "Transaction failed", success: false, error: error.message });
+    });
 }

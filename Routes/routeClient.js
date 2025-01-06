@@ -1,5 +1,5 @@
 import express from "express";
-import {addClient, getAllClients, updateClient, deleteClient } from "../controllers/routeClient.js";
+import {addClient, getAllClients, updateClient, deleteClient, updateBalanceAndKeepHistory } from "../controllers/routeClient.js";
 
 const RouteClientRouter = express.Router();
 
@@ -13,5 +13,7 @@ RouteClientRouter.route("/:id")
 RouteClientRouter.route("/:name")
 .get(getAllClients);
 
+RouteClientRouter.route("/history")
+.post(updateBalanceAndKeepHistory);
 
 export default RouteClientRouter;
