@@ -68,6 +68,7 @@ export function updateClient(req, res) {
   RouteClients.findByIdAndUpdate(req.body._id)
     .then((data) => {
       data.clientName = req.body.clientName;
+      data.balanceAmount=req.body.balanceAmount;
       data
         .save()
         .then(() => {
