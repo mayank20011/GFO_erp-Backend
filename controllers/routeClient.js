@@ -42,6 +42,7 @@ export function getAllClients(req, res) {
         data = data.map((item) => ({
           name: item.clientName,
           _id: item._id,
+          balanceAmount:item.balanceAmount
         }));
         res.status(200).json({
           success: true,
