@@ -5,7 +5,10 @@ const PurchaseData=new Schema({
       type:String,
       required:[true,'Enter Vendor Name']
     },
-    purchaseRecord:[]
+    purchaseRecord:{
+      type:{},
+      required:[true, 'Enter purchase Record']
+    }
 });
 
 export default mongoose.model('PurchaseData',PurchaseData );

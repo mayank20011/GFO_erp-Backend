@@ -6,7 +6,7 @@ PurchaseDataRouter.route("/")
 .get(PurchasingClientNames)
 .post(savePurchaseData);
 
-PurchaseDataRouter.route("/:_id")
+PurchaseDataRouter.route("/:name")
 .get(getPurchaseData)
 PurchaseDataRouter.route("/createRecord")
 .post(createObjForVendor);

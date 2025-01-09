@@ -1,5 +1,6 @@
 import PurchaseData from "../models/PurchaseData.js";
-
+import PurchaseVendors from "../models/PurchaseVendors.js";
+import mongoose from "mongoose";
 export function PurchasingClientNames(req, res) {
   PurchaseData.find()
     .select("vendorName _id")
@@ -20,12 +21,14 @@ export function PurchasingClientNames(req, res) {
 }
 
 export function getPurchaseData(req, res) {
-  PurchaseData.findById(req.params._id)
+  console.log("req Hit");
+  PurchaseData.find({ vendorName: req.params.name })
     .then((data) => {
       if (data) {
+        console.log(data);
         res.status(201).json({
           success: true,
-          data: data.purchaseRecord,
+          data: data,
           message: "Data Found",
         });
       } else {
@@ -46,40 +49,66 @@ export function getPurchaseData(req, res) {
 
 export function savePurchaseData(req, res) {
   console.log(req.body);
-  PurchaseData.findOne({ vendorName: req.body.vendorName })
-    .then((data) => {
-      if (data == null) {
-        res.status(404).json({
-          success: false,
-          err: `No Such Vendor In DB`,
-        });
-      } else {
-        const dataToPush = req.body;
-        delete dataToPush.vendorName;
-        data.purchaseRecord.push(dataToPush);
-        console.log(data.purchaseRecord);
-        data
-          .save()
-          .then(() => {
-            res.status(201).json({
-              success: true,
-            });
-          })
-          .catch(() => {
-            res.status(201).json({
-              success: true,
-              err: `Cant Save to db`,
+  const vendorName = req.body.vendorName;
+  const purchaseRecord = req.body;
+  delete purchaseRecord.vendorName;
+
+  const session = mongoose.startSession();
+
+  session
+    .then((session) => {
+      session.startTransaction();
+
+      return PurchaseData.create(
+        [
+          {
+            vendorName: vendorName,
+            purchaseRecord: purchaseRecord,
+          },
+        ],
+        { session }
+      )
+        .then(() => {
+          return PurchaseVendors.findById(req.body.id, null, { session });
+        })
+        .then((vendor) => {
+          if (!vendor) {
+            throw new Error("Vendor not found");
+          }
+
+          vendor.balanceAmount += req.body.money;
+          return vendor.save({ session });
+        })
+        .then(() => {
+          return session.commitTransaction();
+        })
+        .then(() => {
+          session.endSession();
+          res.status(200).json({
+            message: "Transaction successful",
+            success: true,
+          });
+        })
+        .catch((error) => {
+          return session.abortTransaction().then(() => {
+            session.endSession();
+            res.status(500).json({
+              message: "Transaction failed",
+              success: false,
+              error: error.message,
             });
           });
-      }
+        });
     })
     .catch((err) => {
       res.status(500).json({
         success: false,
-        err: err,
+        error: err.message,
+        message: "Server Problem",
       });
     });
 }
+
 
 export function createObjForVendor(req, res, next) {
   console.log(req.body);

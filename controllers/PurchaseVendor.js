@@ -13,6 +13,32 @@ export function getAllVendors(req, res) {
     });
 }
 
+export function getAllVendorsName(req, res) {
+  PurchaseVendors.find({}, 'name')
+    .then((data) => {
+      console.log(data);
+      if (data.length === 0) {
+        res.status(500).json({
+          success: false,
+          message: "No Users in Db",
+        });
+      } else {
+        res.status(201).json({
+          success: true,
+          data: data,
+          message: "Data Found",
+        });
+      }
+    })
+    .catch((err) => {
+      res.status(500).json({
+        success: false,
+        err: err,
+        message: "Server Problem",
+      });
+    });
+}
+
 export function replaceVendor(req, res, next) {
   console.log("fun run");
   PurchaseVendors.findOneAndReplace({ _id: req.body._id }, req.body)
@@ -32,40 +58,30 @@ export function replaceVendor(req, res, next) {
 }
 
 export function addNewVendor(req, res) {
-  const { data, record } = req.body;
 
-  // Ensure vendorName is set in the record
-  if (!record.vendorName) {
-    record.vendorName = data.name || "Default Vendor Name";
-  }
-
-  const runTransactionExample = () => {
-    return startSessionAndTransaction((session) => {
-      return PurchaseVendors.create([data], { session }) // Wrap data in an array
-        .then(() => PurchaseData.create([record], { new: true, session })) // Include session in options
-        .catch((error) => {
-          throw error;
-        });
-    });
-  };
-
-  runTransactionExample()
-    .then(() => {
-      // Transaction committed, send a success response
-      res.status(200).json({
-        message: "Vendor Created Successfully",
-        success: true,
-        data: { data, record },
-      });
-    })
-    .catch((error) => {
-      // Transaction aborted or an error occurred, send an error response
+  PurchaseVendors.create(req.body)
+  .then((data)=>{
+    if(data){
+      res.status(201).json({
+        success:true,
+        message:'Created Successfully',
+        data:data,
+      })
+    }
+    else{
       res.status(500).json({
-        message: "Vendor Creation failed",
-        success: false,
-        error: error.message,
-      });
-    });
+        success:false,
+        message:'Data Not Found',
+      })
+    }
+  })
+  .catch((err)=>{
+    res.status(500).json({
+      success:false,
+      err:err,
+      message:'Server Problem',
+    })
+  })
 }
 
 export function updateBalanceAndKeepHistory(req, res) {
