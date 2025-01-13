@@ -50,31 +50,42 @@ export function getPurchaseData(req, res) {
 }
 
 // export function savePurchaseData(req, res) {
-//   console.log(req.body);
-//   // const balanceAmount = req.body.balanceAmount;
 
-//   if (req.body.passedOrFailed != "Failled") {
-//     const toPushInLedger = {
+//   let toPushInLedger = null;
+//   if (req.body.passedOrFailed !== "Failled") {
+//     toPushInLedger = {
 //       Time: req.body.dateAndTime,
 //       paymentType: "Purchase",
-//       paymentDetails: {},
+//       paymentDetails: {
+//         cash: {
+//           amount: "",
+//         },
+//         upi: {
+//           amount: "",
+//           refNo: "",
+//         },
+//         others: {
+//           amount: "",
+//           refNo: "",
+//         },
+//       },
 //       transactionHandler: "",
-//       amount: req.body.money,
+//       amount: parseFloat(req.body.money), // Make sure the amount is a number
 //       vendorName: req.body.vendorName,
 //       vendor_id: req.body.id,
-//       pendingAmount: balanceAmount + req.body.money,
-//       lastPendingAmount: balanceAmount,
+//       pendingAmount:
+//         parseFloat(req.body.balanceAmount) + parseFloat(req.body.money),
+//       lastPendingAmount: parseFloat(req.body.balanceAmount),
 //     };
 //     console.log(toPushInLedger);
 //   }
-
+  
 //   const vendorName = req.body.vendorName;
 //   const purchaseRecord = req.body;
 //   delete purchaseRecord.vendorName;
 
-//   const session = mongoose.startSession();
-
-//   session
+//   mongoose
+//     .startSession()
 //     .then((session) => {
 //       session.startTransaction();
 
@@ -94,9 +105,13 @@ export function getPurchaseData(req, res) {
 //           if (!vendor) {
 //             throw new Error("Vendor not found");
 //           }
-//           console.log(vendor);
 //           vendor.balanceAmount += parseFloat(req.body.money);
 //           return vendor.save({ session });
+//         })
+//         .then(() => {
+//           if (toPushInLedger) {
+//             return PayamentRecord.create([toPushInLedger], { session });
+//           }
 //         })
 //         .then(() => {
 //           return session.commitTransaction();
@@ -130,35 +145,35 @@ export function getPurchaseData(req, res) {
 // }
 
 export function savePurchaseData(req, res) {
-  console.log(req.body);
+  const money = req.body.money ?parseFloat(req.body.money) : 0;
+  const balanceAmount = parseFloat(req.body.balanceAmount);
+
+  console.log(money,  balanceAmount);
+
+  if (isNaN(money) || isNaN(balanceAmount)) {
+      return res.status(400).json({
+          message: "Invalid input: money or balanceAmount is not a number",
+          success: false,
+      });
+  }
 
   let toPushInLedger = null;
   if (req.body.passedOrFailed !== "Failled") {
-    toPushInLedger = {
-      Time: req.body.dateAndTime,
-      paymentType: "Purchase",
-      paymentDetails: {
-        cash: {
-          amount: "",
-        },
-        upi: {
-          amount: "",
-          refNo: "",
-        },
-        others: {
-          amount: "",
-          refNo: "",
-        },
-      },
-      transactionHandler: "",
-      amount: parseFloat(req.body.money), // Make sure the amount is a number
-      vendorName: req.body.vendorName,
-      vendor_id: req.body.id,
-      pendingAmount:
-        parseFloat(req.body.balanceAmount) + parseFloat(req.body.money),
-      lastPendingAmount: parseFloat(req.body.balanceAmount),
-    };
-    console.log(toPushInLedger);
+      toPushInLedger = {
+          Time: req.body.dateAndTime,
+          paymentType: "Purchase",
+          paymentDetails: {
+              cash: { amount: "" },
+              upi: { amount: "", refNo: "" },
+              others: { amount: "", refNo: "" },
+          },
+          transactionHandler: "",
+          amount: money,
+          vendorName: req.body.vendorName,
+          vendor_id: req.body.id,
+          pendingAmount: balanceAmount + money,
+          lastPendingAmount: balanceAmount,
+      };
   }
 
   const vendorName = req.body.vendorName;
@@ -166,64 +181,43 @@ export function savePurchaseData(req, res) {
   delete purchaseRecord.vendorName;
 
   mongoose
-    .startSession()
-    .then((session) => {
-      session.startTransaction();
+      .startSession()
+      .then((session) => {
+          session.startTransaction();
 
-      return PurchaseData.create(
-        [
-          {
-            vendorName: vendorName,
-            purchaseRecord: purchaseRecord,
-          },
-        ],
-        { session }
-      )
-        .then(() => {
-          return PurchaseVendors.findById(req.body.id, null, { session });
-        })
-        .then((vendor) => {
-          if (!vendor) {
-            throw new Error("Vendor not found");
-          }
-          console.log(vendor);
-          vendor.balanceAmount += parseFloat(req.body.money);
-          return vendor.save({ session });
-        })
-        .then(() => {
-          if (toPushInLedger) {
-            return PayamentRecord.create([toPushInLedger], { session });
-          }
-        })
-        .then(() => {
-          return session.commitTransaction();
-        })
-        .then(() => {
-          session.endSession();
-          res.status(200).json({
-            message: "Transaction successful",
-            success: true,
-          });
-        })
-        .catch((error) => {
-          return session.abortTransaction().then(() => {
-            console.log(error);
-            session.endSession();
-            res.status(500).json({
-              message: "Transaction failed",
-              success: false,
-              error: error.message,
-            });
-          });
-        });
-    })
-    .catch((err) => {
-      res.status(500).json({
-        success: false,
-        error: err.message,
-        message: "Server Problem",
+          return PurchaseData.create(
+              [{ vendorName: vendorName, purchaseRecord: purchaseRecord }],
+              { session }
+          )
+              .then(() => PurchaseVendors.findById(req.body.id, null, { session }))
+              .then((vendor) => {
+                  if (!vendor) {
+                      throw new Error("Vendor not found");
+                  }
+                  vendor.balanceAmount += money;
+                  return vendor.save({ session });
+              })
+              .then(() => {
+                  if (toPushInLedger) {
+                      return PayamentRecord.create([toPushInLedger], { session });
+                  }
+              })
+              .then(() => session.commitTransaction())
+              .then(() => {
+                  session.endSession();
+                  res.status(200).json({ message: "Transaction successful", success: true });
+              })
+              .catch((error) => {
+                  return session.abortTransaction().then(() => {
+                      console.log(error);
+                      session.endSession();
+                      res.status(500).json({ message: "Transaction failed", success: false, error: error.message });
+                  });
+              });
+      })
+      .catch((err) => {
+          res.status(500).json({ success: false, error: err.message, message: "Server Problem" });
       });
-    });
 }
 
 export function createObjForVendor(req, res, next) {
