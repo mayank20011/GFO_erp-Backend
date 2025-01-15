@@ -28,8 +28,9 @@ export function addSalesData(req, res) {
 }
 
 export function getClientsData(req,res){
-  salesData.find({vendorName:req.params.vendorName , client:req.params.client})
+  salesData.find({vendorName:req.params.vendorName , client:req.params.client}).sort({_id : -1})
   .then((data)=>{
+    console.log(data);
     if(data.length!=0){
     res.status(201).json({
       success:true,

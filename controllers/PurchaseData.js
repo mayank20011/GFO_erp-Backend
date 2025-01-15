@@ -24,7 +24,7 @@ export function PurchasingClientNames(req, res) {
 
 export function getPurchaseData(req, res) {
   console.log("req Hit");
-  PurchaseData.find({ vendorName: req.params.name })
+  PurchaseData.find({ vendorName: req.params.name }).sort({_id:-1})
     .then((data) => {
       if (data) {
         console.log(data);
